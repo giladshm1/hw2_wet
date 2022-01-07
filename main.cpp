@@ -16,7 +16,7 @@ int PtrIntComparator(AVLTree<int>::AVLValue num1, AVLTree<int>::AVLValue num2) {
 
 int main() {
     // array that contains keys to be mapped
-    int a[] = {14, 13, 27, 8, 12, 18};
+    int a[] = {14, 13, 27, 8, 12, 18, 15};
     int n = sizeof(a) / sizeof(a[0]);
 
     // insert the keys into the hash table
