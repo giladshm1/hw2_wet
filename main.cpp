@@ -1,20 +1,15 @@
 #include <iostream>
 #include "HashTable.h"
+#include "UnionFind.h"
 
-template<typename T>
-int Compare(T val1, T val2) {
-    if (val1 < val2)
-        return -1;
-    if (val2 < val1)
-        return 1;
-    return 0;
-}
 
 int PtrIntComparator(AVLTree<int>::AVLValue num1, AVLTree<int>::AVLValue num2) {
     return Compare(*num1, *num2);
 }
 
 int main() {
+    auto *uf = new UnionFind(5);
+
     // array that contains keys to be mapped
     int a[] = {14, 13, 27, 8, 12, 18, 15};
     int n = sizeof(a) / sizeof(a[0]);

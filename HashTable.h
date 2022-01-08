@@ -28,6 +28,7 @@ public:
         }
 
         for (int i = 0; i < initial_size; ++i) {
+            //TODO: maybe delete the default tree in teach cell of the array.
             table[i] = AVLTree<T>(comparator);
         }
     }
