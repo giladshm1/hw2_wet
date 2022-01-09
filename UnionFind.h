@@ -10,11 +10,12 @@
 class UnionFind {
     int size;
     int *parents;
-    Group *pointers[];
+    Group **pointers;
 
 public:
-    UnionFind(int size) : size(size) {
+    explicit UnionFind(int size) : size(size) {
         parents = new int[size];
+        pointers = new Group *[size];
 
         for (int i = 0; i < size; ++i) {
             parents[i] = -1;
@@ -37,19 +38,21 @@ public:
     }
 
     void Union(Group *g1, Group *g2) {
-        if (g1->size < g2->size) {
-            parents[g1->id] = g2->id;
-            g2->size += g1->size;
-        } else {
-            parents[g2->id] = g1->id;
-            g1->size += g2->size;
+        if (g1 == g2) {
+            return;
         }
 
-        mergeData(g1, g2);
-    }
-
-    void mergeData(Group*g1, Group* g2){
-        return;
+        if (g1->size_uf < g2->size_uf) {
+            parents[g1->id] = g2->id;
+            g2->mergeData(g1);
+            pointers[g1->id] = NULL;
+            delete g1;
+        } else {
+            parents[g2->id] = g1->id;
+            g1->mergeData(g2);
+            pointers[g2->id] = NULL;
+            delete g2;
+        }
     }
 };
 

@@ -6,36 +6,33 @@
 #define HW2_WET_HASHTABLE_H
 
 #include <iostream>
-#include "AVLTree.h"
+#include "LinkedList.h"
 
 
 template<class T>
 class HashTable {
-    typedef std::function<int(T *, T *)> Comparator;
+    static const int initial_size = 2; //maybe another size
 
     int size;
     int current_size;
-    static const int initial_size = 2;
-    AVLTree<T> *table;
-    Comparator comparator;
+    Node<T> **table;
 
 public:
-    HashTable(Comparator comparator) : size(initial_size), current_size(0), comparator(comparator) {
-        table = new AVLTree<T>[initial_size];
+    HashTable() : size(initial_size), current_size(0) {
+        table = new Node<T> *[initial_size];
 
         if (table == NULL) {
             throw std::bad_alloc();
         }
 
         for (int i = 0; i < initial_size; ++i) {
-            //TODO: maybe delete the default tree in teach cell of the array.
-            table[i] = AVLTree<T>(comparator);
+            table[i] = NULL;
         }
     }
 
     void insertItem(int key, T *value) {
         int index = hashFunction(key);
-        table[index].Add(value);
+        insertAtBeginning(&(table[index]), key, value);
         current_size++;
 
         if (size == current_size) {
@@ -43,9 +40,9 @@ public:
         }
     }
 
-    void deleteItem(int key, T *value) {
+    void deleteItem(int key) {
         int index = hashFunction(key);
-        table[index].Remove(value);
+        deleteNode(&(table[index]), key);
         current_size--;
 
         if ((size / 4) == current_size) {
@@ -53,9 +50,9 @@ public:
         }
     }
 
-    T *findItem(int key, T *value) {
+    T *findItem(int key) {
         int index = hashFunction(key);
-        return table[index].Find(value);
+        return searchNode(&(table[index]), key);
     }
 
     int hashFunction(int key) {
@@ -65,30 +62,33 @@ public:
     void resize_table(char operation, int factor) {
         int prev_size = size;
         size = (operation == 'l' ? (size * factor) : (size / factor));
-        auto new_table = new AVLTree<T>[size];
+        auto new_table = new Node<T> *[size];
         if (new_table == NULL) {
             throw std::bad_alloc();
         }
 
         for (int i = 0; i < size; ++i)
-            new_table[i] = AVLTree<T>(comparator);
+            new_table[i] = NULL;
 
         for (int i = 0; i < prev_size; ++i) {
-            if (table[i].GetSize() != 0) {
-                cloneTreeToNewHashTable(table[i], new_table);
-                //TODO: delete the table[i] tree.
+            if (table[i] != NULL) {
+                cloneListToNewHashTable(table[i], new_table);
+                //TODO: delete the table[i] list.
             }
         }
 
-        //delete table;
+        delete[] table;
         table = new_table;
     }
 
-    void cloneTreeToNewHashTable(AVLTree<T> tree, AVLTree<T> *new_table) {
-        //TODO: complete this function. we should use specific function that uses the
-        // special key of each player that saved in the hash table.
-    }
+    void cloneListToNewHashTable(Node<T> *list, Node<T> **new_table) {
+        struct Node<T> *current = list;
 
+        while (current != NULL) {
+            insertAtBeginning(&(new_table[hashFunction(current->key)]), current->key, current->data);
+            current = current->next;
+        }
+    }
 };
 
 #endif //HW2_WET_HASHTABLE_H
